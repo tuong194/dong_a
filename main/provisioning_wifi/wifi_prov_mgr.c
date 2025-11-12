@@ -270,14 +270,12 @@ static void config_wifi_prov(type_transport_e type_prov)
 {
     config_wifi.is_provisioning = true;
     wifi_prov_mgr_config_t config={
-        //.scheme = NULL,//wifi_prov_scheme_softap,
+        //.scheme = NULL,
         .scheme_event_handler = WIFI_PROV_EVENT_HANDLER_NONE
     };
-    // wifi_prov_event_handler_t event_handler = WIFI_PROV_EVENT_HANDLER_NONE;
-
+    deinit_ble_task();
     if (type_prov == TRANSPORT_BLE)
     {
-        deinit_ble_task();
         config.scheme = wifi_prov_scheme_ble;
     }
     else
@@ -326,6 +324,7 @@ void check_provisioning_status(void)
     if (!provisioned)
     {
         ESP_LOGE(TAG, "Device is not provisioned");
+        // start_wifi_prov_mgr(TRANSPORT_SOFTAP);
     }
     else
     {
@@ -388,7 +387,7 @@ static void time_out_prov_task(void *param){
 
 static void wifi_connected_task(void *param)
 {
-    wifi_event_group = xEventGroupCreate();
+    // wifi_event_group = xEventGroupCreate();
     init_wifi_prov_mgr();
     check_provisioning_status();
     while (1)
