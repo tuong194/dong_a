@@ -186,7 +186,7 @@ void btn_event_init(esp_event_handler_t event_handler){
         .queue_size = 5,
         .task_name = "btn_event_loop",
         .task_priority = uxTaskPriorityGet(NULL),
-        .task_stack_size = 2048*2,
+        .task_stack_size = 2048*3,
         .task_core_id = tskNO_AFFINITY
     };
     ESP_ERROR_CHECK(esp_event_loop_create(&loop_args, &btn_event_loop));

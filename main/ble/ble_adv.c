@@ -86,6 +86,7 @@ void ble_host_task(void *param)
 {
     nimble_port_run(); // BLE host loop
     nimble_port_freertos_deinit();
+    vTaskDelete(NULL);  
 }
 
 void deinit_ble_task(void)
@@ -95,6 +96,7 @@ void deinit_ble_task(void)
         ESP_LOGW(TAG, "deinit ble adv");
         is_init_ble = false;
         nimble_port_stop();
+        vTaskDelay(pdMS_TO_TICKS(100));
         ESP_ERROR_CHECK(nimble_port_deinit());
     }
 }

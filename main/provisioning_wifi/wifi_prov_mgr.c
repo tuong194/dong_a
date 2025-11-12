@@ -109,10 +109,6 @@ static void event_handler(void *arg, esp_event_base_t event_base,
             ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &sta_cfg));
             ESP_LOGW(TAG, "SSID: %s", sta_cfg.sta.ssid);
             ESP_LOGW(TAG, "Password: %s", sta_cfg.sta.password);
-            // sprintf(config.ssid_config, "%s", sta_cfg.sta.ssid);
-            // memcpy(ssid_config, sta_cfg.sta.ssid, sizeof(sta_cfg.sta.ssid));
-            // memcpy(pass_config, sta_cfg.sta.password, sizeof(sta_cfg.sta.password));
-
             esp_wifi_connect();
             break;
         }
@@ -222,7 +218,7 @@ static void get_device_service_name(char *service_name, size_t max)
              ssid_prefix, eth_mac[3], eth_mac[4], eth_mac[5]);
 }
 
-static void wifi_prov_print_info(const char *name, const char *pop, const char *transport)
+static void wifi_prov_print_info(const char *name, const char *pass, const char *pop, const char *transport)
 {
     if (!name || !transport)
     {
@@ -232,9 +228,9 @@ static void wifi_prov_print_info(const char *name, const char *pop, const char *
     char payload[150] = {0};
     if (pop)
     {
-        snprintf(payload, sizeof(payload), "{\"name\":\"%s\",\"name\":\"%s\""
+        snprintf(payload, sizeof(payload), "{\"name\":\"%s\",\"pass\":\"%s\""
                                            ",\"pop\":\"%s\",\"transport\":\"%s\"}",
-                 name,RD_PASS_WIFI_SOFTAP, pop, transport);
+                 name,(pass == NULL) ? " " : pass , pop, transport);
     }
     else
     {
@@ -264,9 +260,9 @@ esp_err_t custom_prov_data_handler(uint32_t session_id, const uint8_t *inbuf, ss
     return ESP_OK;
 }
 
+    // delete in4 wifi in NVS
 void reset_wifi_prov_mgr(void)
 {
-    // delete in4 wifi in NVS
     wifi_prov_mgr_reset_provisioning();
 }
 
@@ -314,18 +310,18 @@ static void config_wifi_prov(type_transport_e type_prov)
     const char *pop = PROV_SEC1_PWD;
     if (type_prov == TRANSPORT_BLE)
     {
-        wifi_prov_print_info(service_name, pop, PROV_TRANSPORT_BLE);
+        wifi_prov_print_info(service_name, service_key, pop, PROV_TRANSPORT_BLE);
     }
     else
     {
-        wifi_prov_print_info(service_name, pop, PROV_TRANSPORT_SOFTAP); // log
+        wifi_prov_print_info(service_name, service_key, pop, PROV_TRANSPORT_SOFTAP); // log
     }
 }
 
 void check_provisioning_status(void)
 {
     bool provisioned = false;
-    reset_wifi_prov_mgr();
+    // reset_wifi_prov_mgr();
     ESP_ERROR_CHECK(wifi_prov_mgr_is_provisioned(&provisioned));
     if (!provisioned)
     {
@@ -349,6 +345,7 @@ void stop_wifi_prov_mgr(void)
 }
 
 void start_wifi_prov_mgr(type_transport_e type_prov){
+    if(type_prov > TRANSPORT_SOFTAP) return;
     config_wifi.type_prov = type_prov;
     config_wifi.time_out = esp_timer_get_time();
     if(config_wifi.is_provisioning){

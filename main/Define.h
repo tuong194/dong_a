@@ -3,6 +3,8 @@
 
 #include "soc/gpio_num.h"
 
+#define TICK_INTERVAL    10 //ms
+
 #define OFF_STT    0
 #define ON_STT     1
 

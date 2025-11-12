@@ -311,7 +311,7 @@ static void control_task(void *arg)
         loop_check_countdown();
         loop_check_save_flash();
 
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(TICK_INTERVAL / portTICK_PERIOD_MS);
     }
 }
 

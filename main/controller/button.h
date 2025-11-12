@@ -6,14 +6,15 @@
 #include "esp_event.h"
 
 #define COUNT_CYCLE_ACTIVE_BTN      5
-#define TIME_OUT_KICK_OUT           10*1000*1000
-#define TIME_CYCLE_KICK_OUT         3*1000*1000 
-#define TIME_CYCLE_SET_PAIR         3*1000*1000 
-#define TIME_CYCLE_CONFIG_WIFI      2*1000*1000 
-
 #define TIME_CHECK_HOLD_MS          1000
-#define TIME_COUNT_HOLD             100//TIME_CHECK_HOLD_MS/(COUNT_CYCLE_ACTIVE_BTN*10)  //10ms scan 1 lan
- 
+#define TIME_COUNT_HOLD             ((TIME_CHECK_HOLD_MS /TICK_INTERVAL) - COUNT_CYCLE_ACTIVE_BTN + 1)
+#define SET_TIME_OUT_SECOND(x)      (x*1000*1000 - TIME_CHECK_HOLD_MS*1000)
+
+#define TIME_OUT_KICK_OUT           SET_TIME_OUT_SECOND(10)
+#define TIME_CYCLE_KICK_OUT         SET_TIME_OUT_SECOND(3)
+#define TIME_CYCLE_SET_PAIR         SET_TIME_OUT_SECOND(3)
+#define TIME_CYCLE_CONFIG_WIFI      SET_TIME_OUT_SECOND(3)
+
 ESP_EVENT_DECLARE_BASE(BUTTON_EVENT_BASE);
 
 typedef enum 
@@ -41,7 +42,11 @@ typedef struct
     Button_Stt_Type_t button_stt;
 }button_param_t;
 
-
+/**
+ * @brief hàm khởi tạo event loop cho button
+ * 
+ * @param event_handler 
+ */
 void btn_event_init(esp_event_handler_t event_handler);
 void btn_manager_loop(void);
 
