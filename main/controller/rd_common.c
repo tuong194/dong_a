@@ -275,11 +275,12 @@ static void btn_event_handle(void* arg, esp_event_base_t event_base, int32_t eve
         case EVENT_BUTTON_CONFIG_WIFI:
             ESP_LOGI("COMMON","event config wwifi");
             led_set_blink(ALL_LED, 7, 100);
-            start_wifi_prov_mgr(TRANSPORT_SOFTAP);
+            start_wifi_prov_mgr();
             break;
         case EVENT_BUTTON_KICK_OUT:
             ESP_LOGI("BTN_MANAGER", "KICK OUT !!!");
             lc8823_blink_led(ALL_LED, 11, 300);
+            reset_wifi_prov_mgr();
             //restart
             break;
         case EVENT_BUTTON_INC_COUNT_KICK_OUT:

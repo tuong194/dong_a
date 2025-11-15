@@ -88,12 +88,12 @@ static void event_handler(void *arg, esp_event_base_t event_base,
             /* De-initialize manager once provisioning is finished */
             ESP_LOGW("RD WIFI PROV", "\n wifi provision end, deinit wifi_prov_mgr\n");
             wifi_prov_mgr_deinit();
+            init_ble_adv();
             config_wifi.is_provisioning = false;
             if(config_wifi.is_config_wifi){
                 config_wifi.is_config_wifi = false;
                 config_wifi_prov(config_wifi.type_prov);
             }
-            init_ble_adv();
             break;
         default:
             break;
@@ -343,9 +343,10 @@ void stop_wifi_prov_mgr(void)
     wifi_prov_mgr_stop_provisioning();
 }
 
-void start_wifi_prov_mgr(type_transport_e type_prov){
-    if(type_prov > TRANSPORT_SOFTAP) return;
-    config_wifi.type_prov = type_prov;
+void start_wifi_prov_mgr(void){
+
+    if(config_wifi.type_prov == TRANSPORT_SOFTAP) config_wifi.type_prov = TRANSPORT_BLE;
+    else config_wifi.type_prov = TRANSPORT_SOFTAP;
     config_wifi.time_out = esp_timer_get_time();
     if(config_wifi.is_provisioning){
         stop_wifi_prov_mgr();

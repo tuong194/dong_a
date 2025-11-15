@@ -30,7 +30,7 @@ typedef struct{
 }config_wifi_t;
 
 void reset_wifi_prov_mgr(void);
-void start_wifi_prov_mgr(type_transport_e type_prov);
+void start_wifi_prov_mgr(void );
 void stop_wifi_prov_mgr(void);
 void init_wifi_provision(void);
 
