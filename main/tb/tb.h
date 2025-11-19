@@ -1,7 +1,7 @@
 #ifndef TB_H__
 #define TB_H__
 
-#include "mqtt.h"
+#include "Mqtt.h"
 #include <cJSON.h>
 #include <sys/queue.h>  //STAILQ
 
@@ -25,7 +25,7 @@ typedef struct rpc_register
 } rpc_register_t;
 
 void tb_init();
-int tb_connect(const char *username, const char *password);
+int tb_connect(const Config_t config);
 int tb_mqtt_disconnect();
 bool tb_is_connected();
 

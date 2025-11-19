@@ -33,7 +33,7 @@
 #include "mqtt.h"
 #include "err_code.h"
 #include "tb.h"
-#include "rd_config.h"
+#include "LC8823.h"
 
 
 static const char *TAG = "mqtt_eth";
@@ -53,6 +53,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 	case MQTT_EVENT_CONNECTED:
 		ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
 		is_connected = true;
+		config_stt_connect_mqtt(is_connected);
 		if (mqtt_callback_driver && mqtt_callback_driver->on_connected)
 		{
 			mqtt_callback_driver->on_connected(0);
@@ -61,6 +62,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 	case MQTT_EVENT_DISCONNECTED:
 		ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
 		is_connected = false;
+		config_stt_connect_mqtt(is_connected);
 		if (mqtt_callback_driver && mqtt_callback_driver->on_disconnected)
 		{
 			mqtt_callback_driver->on_disconnected(0);
@@ -121,7 +123,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 	}
 }
 
-int mqtt_connect(const char *username, const char *password)
+int mqtt_connect(const Config_t config)
 {
 	ESP_LOGI(TAG, "mqtt_connect");
 #if 0

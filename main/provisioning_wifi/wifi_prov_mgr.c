@@ -18,6 +18,10 @@
 #include "wifi_prov_mgr.h"
 #include "ble_adv.h"
 
+#include "tb.h"
+#include "device.h"
+#include "rd_config.h"
+
 // ESP_EVENT_DEFINE_BASE(RD_WIFI_EVENT_BASE);
 
 static const char *TAG = "RD_WIFI_PROV_MGR";
@@ -36,6 +40,15 @@ static config_wifi_t config_wifi = {
 };
 uint8_t ssid_config[32];
 uint8_t pass_config[64];
+
+static void rd_connect_tb(void){
+    static bool first_connect = true;
+    if(first_connect){
+        first_connect = false;
+        tb_connect(config);
+        device_init_rpc_call_back();
+    }
+}
 
 static void event_handler(void *arg, esp_event_base_t event_base,
                           int32_t event_id, void *event_data)
@@ -137,14 +150,12 @@ static void event_handler(void *arg, esp_event_base_t event_base,
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-        // uint32_t ip_connect = (uint32_t)event->ip_info.ip;
         ESP_LOGI(TAG, "Connected with IP Address:" IPSTR, IP2STR(&event->ip_info.ip));
+        sprintf(config.ip, "%d.%d.%d.%d", IP2STR(&event->ip_info.ip));
         // sprintf((char *)config.ip, (const char *)"%d.%d.%d.%d", (ip_connect>>24) & 0xff, (ip_connect>>16) & 0xff, (ip_connect>>8) & 0xff, (ip_connect) & 0xff);
-        // sprintf(config.ip, "%d.%d.%d.%d", IP2STR(&event->ip_info.ip));
         // printf("ip: %s\n\n", config.ip);
         /* Signal main application to continue execution */
         xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_EVENT);
-        // #if RD_CONFIG_PROV_TRANSPORT == RD_PROV_TRANSPORT_BLE
     }
     else if (event_base == PROTOCOMM_TRANSPORT_BLE_EVENT)
     {
@@ -248,15 +259,29 @@ esp_err_t custom_prov_data_handler(uint32_t session_id, const uint8_t *inbuf, ss
     {
         ESP_LOGI(TAG, "Received data: %.*s", inlen, (char *)inbuf);
     }
-    char response[] = "SUCCESS";
-    *outbuf = (uint8_t *)strdup(response);
-    if (*outbuf == NULL)
-    {
-        ESP_LOGE(TAG, "System out of memory");
-        return ESP_ERR_NO_MEM;
-    }
-    *outlen = strlen(response) + 1; /* +1 for NULL terminating byte */
 
+    if (inbuf && strncmp((const char *)inbuf, "getDevInfo", inlen) == 0)
+    {
+        char response[20];
+        strncpy(response, config.mac, sizeof(response));
+        response[sizeof(response) - 1] = '\0';
+
+        *outbuf = (uint8_t *)strdup(response);
+        if (*outbuf == NULL)
+        {
+            ESP_LOGE(TAG, "System out of memory");
+            return ESP_ERR_NO_MEM;
+        }
+        *outlen = strlen(response) + 1;
+        ESP_LOGI(TAG, "Send MAC: %s", response);
+    }
+    else
+    {
+        const char *error_msg = "ERROR";
+        *outbuf = (uint8_t *)strdup(error_msg);
+        *outlen = strlen(error_msg) + 1;
+        ESP_LOGW(TAG, "Unsupported action or invalid data");
+    }
     return ESP_OK;
 }
 
@@ -403,7 +428,7 @@ static void wifi_connected_task(void *param)
             ESP_LOGW(TAG, "pass: %s", sta_cfg.sta.password);
             memcpy(ssid_config, sta_cfg.sta.ssid, sizeof(sta_cfg.sta.ssid));
             memcpy(pass_config, sta_cfg.sta.password, sizeof(sta_cfg.sta.password));
-            // rd_connect_tb();
+            rd_connect_tb();
         }
     }
 }

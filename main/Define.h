@@ -65,9 +65,18 @@
 #define KEY_NAME_WIFI "nameWifiConnect"
 #define KEY_HOME_ID "dormitoryId"
 
-#define DEVICE_NAME "SWITCH_WIFI_BLE"
-#define DEVICE_TYPE 6262
-#define DEVICE_VERSION "1.0.0"
+#if NUM_ELEMENT == 1
+#define DEVICE_NAME "Congtac1nut_"
+#elif NUM_ELEMENT == 2
+#define DEVICE_NAME "Congtac2nut_"
+#elif NUM_ELEMENT == 3
+#define DEVICE_NAME "Congtac3nut_"
+#elif NUM_ELEMENT == 4
+#define DEVICE_NAME "Congtac4nut_"
+#endif
+
+#define DEVICE_TYPE     6262
+#define DEVICE_VERSION  PROJECT_VER
 
 #define KEY_COUNTDOWN "countdown"
 #define KEY_ONOFF "onoff"

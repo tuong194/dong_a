@@ -13,6 +13,7 @@
 #include "ota.h"
 #include "util.h"
 #include "err_code.h"
+
 #include "LC8823.h"
 #include "device.h"
 
@@ -20,13 +21,6 @@
 
 #define MAX_STRING 128
 
-extern void relay_set(int index, bool value);
-extern bool relay_get(int index);
-// extern char *get_mac_str();
-
-int startscan_with_app = 0;
-extern int nums_new_dev_scan;
-extern uint8_t new_dev_scan[50];
 
 static int msg_id = 1;
 
@@ -505,9 +499,9 @@ void tb_init()
 	mqtt_register_callback_driver(&tb_callback_driver);
 }
 
-int tb_connect(const char *username, const char *password)
+int tb_connect(const Config_t config)
 {
-	return mqtt_connect(username, password);
+	return mqtt_connect(config);
 }
 
 int tb_mqtt_disconnect()

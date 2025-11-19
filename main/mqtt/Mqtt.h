@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "esp_err.h"
+#include "rd_config.h"
 
 typedef struct
 {
@@ -15,7 +16,7 @@ typedef struct
 	void (*on_data)(int msg_id, char *topic, char *payload, int payload_len);
 } mqtt_callback_driver_t;
 
-int mqtt_connect(const char *username, const char *password);
+int mqtt_connect(const Config_t config);
 int mqtt_disconnect();
 bool mqtt_is_connected();
 int mqtt_subscribe(int *msg_id, char *topic);

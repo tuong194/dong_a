@@ -85,6 +85,7 @@ void lc8823_set_dim_onoff(uint8_t index, uint8_t onoff, uint8_t dim_value)
     }
     uint8_t stt_onoff = get_stt_present(index);
     led_data[index].lum = stt_onoff ? led_value[index].ON.lum : led_value[index].OFF.lum;
+    led_update_stt();
 }
 
 void lc8823_set_stt_led(uint8_t index, uint8_t stt)

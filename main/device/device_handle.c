@@ -110,9 +110,9 @@ static void set_color(uint8_t index, uint8_t onoff, rgb_t rgb, uint8_t val){
     default:
         break;
     }
-    ESP_LOGE("DEVICE", "count key COLOR: %d", count_key_color);
+    // ESP_LOGI("DEVICE", "count key COLOR: %d", count_key_color);
     if(count_key_color == 3){
-        ESP_LOGE("DEVICE", "set color ok");
+        // ESP_LOGE("DEVICE", "set color ok");
         lc8823_set_color(index, onoff, red, green, blue);
         count_key_color = 0;
     }
@@ -313,7 +313,7 @@ int do_add_home_handle(cJSON *reqJson){
             }else{
 				printf("CHECK OK\n\n");
 				Config_SetHomeId(homeId);
-				Config_Set_addHome(1);
+			
 				return CODE_OK;
             }
         }else{
@@ -343,7 +343,7 @@ int do_del_home_handle(cJSON *reqJson){
         if(strcmp(mac, config.mac) == 0 && strcmp(homeId, config.home_id) == 0){
             ESP_LOGW(TAG_DEVICE, "xoa nha");
             Config_SetHomeId(HOME_ID_DEFAULT);
-			Config_Set_addHome(0);
+			
             return CODE_OK;
         }else{
             ESP_LOGE(TAG_DEVICE, "check mac or homeID fail");

@@ -7,7 +7,7 @@ file(GLOB srcs
     "controller/*.c"
     "peripheral/*.c"
     "wifi/*.c"
-    "mqtt/*.c"
+    "mqtt/*.c" 
     "ota/*.c"
     "tb/*.c"
     "util/*.c"

@@ -15,9 +15,8 @@
 #define KEEP_ALIVE_KEY "keepAlive"
 #define TLS_KEY "tls"
 #define HOME_ID_KEY "homeId"
-#define ADD_HOME_KEY "addhome"
 
-#define HOST_DEFAULT "demo.thingsboard.io"
+#define HOST_DEFAULT "iot.facenet.vn"
 #define PORT_DEFAULT 1883
 #define CLIENT_ID_DEFAULT "default_client_id"
 #define USERNAME_DEFAULT "default_username"
@@ -35,13 +34,12 @@ typedef struct {
     int keepAlive;
     bool tls;
     char home_id[STRING_VALUE_MAX_SIZE];
-    uint8_t check_add_home;
     char mac[16];
     char ip[32];
     char ssid_config[32];
-}Config;
+}Config_t;
 
-extern Config config;
+extern Config_t config;
 
 void Config_Read_Flash();
 void Config_Print();
@@ -54,9 +52,7 @@ bool Config_SetPassword(const char *password);
 bool Config_SetKeepAlive(int keepAlive);
 bool Config_SetTLS(bool tls);
 bool Config_SetHomeId(const char *homeId);
-bool Config_Set_addHome(bool add);
-uint8_t inline check_add_home(void) {
-    return config.check_add_home;
-}
+bool check_add_home(void);
+
 
 #endif /* FC278610_3591_4DFC_B68A_F7C40A3573DF */

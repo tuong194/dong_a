@@ -281,7 +281,8 @@ static void btn_event_handle(void* arg, esp_event_base_t event_base, int32_t eve
             ESP_LOGI("BTN_MANAGER", "KICK OUT !!!");
             lc8823_blink_led(ALL_LED, 11, 300);
             reset_wifi_prov_mgr();
-            //restart
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            esp_restart();
             break;
         case EVENT_BUTTON_INC_COUNT_KICK_OUT:
             ESP_LOGI("COMMON","event increase kick out");

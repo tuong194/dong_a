@@ -75,7 +75,7 @@ int rpc_callback_add_home(cJSON *reqJson, cJSON *respJson){
 }
 
 int rpc_callback_del_home(cJSON *reqJson, cJSON *respJson){
-    ESP_LOGW(TAG, "del home");
+    ESP_LOGW(TAG, "rpc del home");
     int rsp = do_del_home_handle(reqJson);
     cJSON *data_param = cJSON_CreateObject();
     cJSON_AddNumberToObject(data_param, "code", rsp);

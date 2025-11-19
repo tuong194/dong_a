@@ -9,7 +9,7 @@
 
 #define NVS_NAME_SPACE "my_nvs"
 
-Config config;
+Config_t config;
 
 /****************************************
  *           Internal Helpers           *
@@ -83,7 +83,7 @@ void Config_Print() {
     ESP_LOGW("Config", "username: %s", config.username);
     ESP_LOGW("Config", "password: %s", config.password);
     ESP_LOGW("Config", "keepAlive: %d", config.keepAlive);
-    ESP_LOGW("Config", "add home ? : %d", config.check_add_home);
+    ESP_LOGW("Config", "add home ? : %d", check_add_home());
 }
 
 static void Get_Mac_Device(void){
@@ -124,21 +124,6 @@ void Config_Read_Flash() {
     else
         config.port = PORT_DEFAULT;
 
-    // if (nvs_get_str(handle, CLIENT_ID_KEY, str_temp, &len) == ESP_OK)
-    //     strncpy(config.clientId, str_temp, sizeof(config.clientId));
-    // else
-    //     strcpy(config.clientId, CLIENT_ID_DEFAULT);
-
-    // if (nvs_get_str(handle, USERNAME_KEY, str_temp, &len) == ESP_OK)
-    //     strncpy(config.username, str_temp, sizeof(config.username));
-    // else
-    //     strcpy(config.username, USERNAME_DEFAULT);
-
-    // if (nvs_get_str(handle, PASSWORD_KEY, str_temp, &len) == ESP_OK)
-    //     strncpy(config.password, str_temp, sizeof(config.password));
-    // else
-    //     strcpy(config.password, PASSWORD_DEFAULT);
-
     if (nvs_get_i32(handle, KEEP_ALIVE_KEY, &int_temp) == ESP_OK)
         config.keepAlive = int_temp;
     else
@@ -154,10 +139,6 @@ void Config_Read_Flash() {
     else
         strcpy(config.home_id, HOME_ID_DEFAULT);
 
-    if (nvs_get_u8(handle, ADD_HOME_KEY, &bool_temp) == ESP_OK)
-        config.check_add_home = bool_temp;
-    else
-        config.check_add_home = 0;
     
     nvs_close(handle);
 
@@ -194,13 +175,16 @@ bool Config_SetTLS(bool tls) {
     return set_bool_config_entry(TLS_KEY, tls);
 }
 
-bool Config_Set_addHome(bool add) {
-    config.check_add_home = add;
-    return set_bool_config_entry(ADD_HOME_KEY, add);
-}
 bool Config_SetHomeId(const char *home_id) {
     strncpy(config.home_id, home_id, sizeof(config.home_id));
     printf("set home id: %s\n", config.home_id);
     return set_str_config_entry(HOME_ID_KEY, home_id);
+}
+
+bool check_add_home(void) {
+    if(!strcmp(config.home_id, HOME_ID_DEFAULT)){
+        return false;
+    }
+    return true;
 }
 
