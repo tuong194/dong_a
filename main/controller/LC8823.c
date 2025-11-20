@@ -175,6 +175,12 @@ void scan_blink_led(void)
         {
             if (rd_exceed_us(led_blink_val[i].last_clockTime_toggle_ms, led_blink_val[i].time_cycle_ms))
             {
+                if (led_blink_val[i].num_of_cycle == 1)
+                {
+                    led_reload_data(i);
+                    led_blink_val[i].num_of_cycle--;
+                    return;
+                }
                 if (led_blink_val[i].num_of_cycle % 2 == 0)
                 {
                     lc8823_set_stt_led(i,1); // dim high
@@ -182,10 +188,6 @@ void scan_blink_led(void)
                 else
                 {
                     lc8823_set_stt_led(i,0); // dim low
-                }
-                if (led_blink_val[i].num_of_cycle == 1)
-                {
-                    led_reload_data(i);
                 }
                 led_blink_val[i].num_of_cycle--;
                 led_blink_val[i].last_clockTime_toggle_ms = esp_timer_get_time();
@@ -229,14 +231,14 @@ void lc8823_blink_led(uint8_t led_idx, uint8_t num_cycle, uint16_t time_delay_ms
     if(led_idx == 0xff){
         while(num_cycle > 0){
             for (uint8_t i = 0; i < NUM_ELEMENT; i++){
+                if(num_cycle == 1){
+                    led_reload_data(i);
+                    return;
+                }
                 if(num_cycle % 2 == 0){
                     lc8823_set_stt_led(i,1);
                 }else{
                     lc8823_set_stt_led(i,0);
-                }
-
-                if(num_cycle == 1){
-                    led_reload_data(i);
                 }
             }
             num_cycle--;

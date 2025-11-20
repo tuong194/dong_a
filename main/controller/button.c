@@ -142,17 +142,17 @@ int btn_check_keeping(){
             }
         }
     }else if(get_num_btn_hold() == 2){
-        if(check_hold_one_btn(ELE_3) && check_hold_one_btn(ELE_4) && rd_exceed_us(time_start_hold, TIME_CYCLE_CONFIG_WIFI)){
+        if(check_hold_one_btn(BTN_3) && check_hold_one_btn(BTN_4) && rd_exceed_us(time_start_hold, TIME_CYCLE_CONFIG_WIFI)){
             time_start_hold = esp_timer_get_time();
-            clear_flag_hold_one_btn(ELE_3);
-            clear_flag_hold_one_btn(ELE_4);
+            clear_flag_hold_one_btn(BTN_3);
+            clear_flag_hold_one_btn(BTN_4);
             esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
             return 0;
         }
-        if(check_hold_one_btn(0) && check_hold_one_btn(1) && rd_exceed_us(time_start_hold, TIME_CYCLE_KICK_OUT)){
+        if(check_hold_one_btn(BTN_1) && check_hold_one_btn(BTN_2) && rd_exceed_us(time_start_hold, TIME_CYCLE_KICK_OUT)){
             time_start_hold = esp_timer_get_time();
-            clear_flag_hold_one_btn(0);
-            clear_flag_hold_one_btn(1);
+            clear_flag_hold_one_btn(BTN_1);
+            clear_flag_hold_one_btn(BTN_2);
             count_kick_out++;
             if (count_kick_out == 3)
             {
@@ -174,12 +174,6 @@ int btn_check_keeping(){
     return -1;
 }
 
-void btn_manager_loop(void)
-{
-    scan_all_btn();
-    btn_check_press();
-    btn_check_keeping();
-}
 
 void btn_event_init(esp_event_handler_t event_handler){
     esp_event_loop_args_t loop_args = {
@@ -191,4 +185,24 @@ void btn_event_init(esp_event_handler_t event_handler){
     };
     ESP_ERROR_CHECK(esp_event_loop_create(&loop_args, &btn_event_loop));
     esp_event_handler_register_with(btn_event_loop, BUTTON_EVENT_BASE, ESP_EVENT_ANY_ID, event_handler, NULL);
+}
+
+static void button_cb(void *args){
+    scan_all_btn();
+    btn_check_press();
+    btn_check_keeping();
+}
+
+void button_manager_init(void)
+{
+    static esp_timer_handle_t g_button_timer_handle = NULL;
+    if(!g_button_timer_handle){
+        esp_timer_create_args_t button_timer = {0};
+        button_timer.arg = NULL;
+        button_timer.callback = button_cb;
+        button_timer.dispatch_method = ESP_TIMER_TASK;
+        button_timer.name = "button_timer";
+        esp_timer_create(&button_timer, &g_button_timer_handle);
+        esp_timer_start_periodic(g_button_timer_handle, TICK_INTERVAL * 1000U);
+    }
 }

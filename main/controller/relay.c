@@ -31,9 +31,7 @@ void control_relay(uint8_t index)
 {
     if (relay_stt[index].flag_check_control == true)
     {
-        relay_set_hw(index);
-        printf("RELAY: set relay_%d\n", index+1);
-        #if 0
+    #if DETECT_ZERO
         if(relay_stt[index].stt_relay){
             if(rd_exceed_us(last_time_crl_relay, TIME_DETECT_ON)){
                 relay_set_hw(index);
@@ -43,10 +41,14 @@ void control_relay(uint8_t index)
                 relay_set_hw(index);
             }
         }
-        #endif
+    #else
+        relay_set_hw(index);
+        printf("RELAY: set relay_%d, %s\n", index+1, relay_stt[index].stt_relay ? "ON":"OFF");
+    #endif
     }
 }
 
+#if DETECT_ZERO
 uint8_t get_detect_zero_pin(void){
     uint8_t stt = gpio_get_level(DETECT_ZERO_PIN);
     return stt;
@@ -74,6 +76,7 @@ void rd_wait_detect_zero(void){
     } while (!(stt_detect_past1 != 0 && stt_detect_past2 != 0 && stt_detect_cur1 == 0 && stt_detect_cur2 == 0)); //falling
     last_time_crl_relay = esp_timer_get_time();
 }
+#endif
 
 void relay_manager_loop(void){
     for (size_t i = 0; i < NUM_ELEMENT; i++)

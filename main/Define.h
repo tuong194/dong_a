@@ -26,24 +26,28 @@
 
 #if NUM_ELEMENT >= 1
     #define ELE_1         0
+    #define BTN_1         ELE_1
     #define BUTTON_PIN1   GPIO_NUM_8
     #define	RELAY1_PIN	  GPIO_NUM_10	
 #endif
 
 #if NUM_ELEMENT >= 2
     #define ELE_2         1
+    #define BTN_2         ELE_2
     #define BUTTON_PIN2   GPIO_NUM_3
     #define	RELAY2_PIN    GPIO_NUM_4
 #endif
 
 #if NUM_ELEMENT >= 3
     #define ELE_3         2
+    #define BTN_3         ELE_3
     #define BUTTON_PIN3   GPIO_NUM_7
     #define	RELAY3_PIN	  GPIO_NUM_5	
 #endif
 
 #if NUM_ELEMENT >= 4
     #define ELE_4         3
+    #define BTN_4         ELE_4
     #define BUTTON_PIN4   GPIO_NUM_0
     #define	RELAY4_PIN	  GPIO_NUM_6
 #endif

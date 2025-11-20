@@ -48,6 +48,7 @@ typedef struct
  * @param event_handler 
  */
 void btn_event_init(esp_event_handler_t event_handler);
-void btn_manager_loop(void);
+void button_manager_init(void);
+
 
 #endif /* BUTTON_H_ */

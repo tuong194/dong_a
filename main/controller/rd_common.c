@@ -13,6 +13,7 @@
 #include "util.h"
 #include "wifi_prov_mgr.h"
 #include "err_code.h"
+#include "rd_config.h"
 
 static void btn_event_handle(void* arg, esp_event_base_t event_base, int32_t event_id, void* data);
 
@@ -31,6 +32,7 @@ static void common_init(void)
     rd_gpio_init();
     led_manager_init();
     btn_event_init(btn_event_handle);
+    button_manager_init();
 }
 
 static void init_value_config_default(void)
@@ -94,8 +96,8 @@ int init_flash_config(void){
     rd_read_flash(KEY_FLASH_CONFIG, &flash_config_value, sizeof(flash_config_value));
     // printf("flash config header : %02x-%02x-%02x-%02x\n", flash_config_value.header[0], flash_config_value.header[1], flash_config_value.header[2], flash_config_value.header[3]);
     // printf("ON.lum: %2x, Off lum: %2x\n", flash_config_value.led_value[0].ON.lum, flash_config_value.led_value[0].OFF.lum);
-    if (flash_config_value.header[0] != FLASH_HEADER_1 && flash_config_value.header[1] != FLASH_HEADER_2 &&\
-        flash_config_value.header[2] != FLASH_HEADER_1 && flash_config_value.header[3] != FLASH_HEADER_2)
+    if ((flash_config_value.header[0] != FLASH_HEADER_1 && flash_config_value.header[1] != FLASH_HEADER_2 &&\
+        flash_config_value.header[2] != FLASH_HEADER_1 && flash_config_value.header[3] != FLASH_HEADER_2) || !check_add_home())
     {
         init_value_config_default();
         load_data_from_flash();
@@ -108,8 +110,10 @@ int init_flash_config(void){
 /*========================================SAVE flash after 3 second========================================*/
 void start_check_save_flash(void)
 {
-    flash_check_save.is_save_flash = true;
-    flash_check_save.time_start_save_flash = esp_timer_get_time();
+    if(!flash_check_save.is_save_flash){
+        flash_check_save.is_save_flash = true;
+        flash_check_save.time_start_save_flash = esp_timer_get_time();
+    }
 }
 
 int loop_check_save_flash(void){
@@ -142,17 +146,17 @@ int loop_check_save_flash(void){
 }
 
 
-void init_onoff_value(void)
-{
-    for (uint8_t i = 0; i < NUM_ELEMENT; i++)
-    {
-        on_off_val[i].present = ON_STT;
-        on_off_val[i].target = ON_STT;
+// void init_onoff_value(void)
+// {
+//     for (uint8_t i = 0; i < NUM_ELEMENT; i++)
+//     {
+//         on_off_val[i].present = ON_STT;
+//         on_off_val[i].target = ON_STT;
 
-        lc8823_set_stt_led(i, on_off_val[i].present); // set stt led
-        set_stt_relay(i, on_off_val[i].present);
-    }
-}
+//         lc8823_set_stt_led(i, on_off_val[i].present); // set stt led
+//         set_stt_relay(i, on_off_val[i].present);
+//     }
+// }
 
 void control_on_off_scan(void)
 {
@@ -304,7 +308,7 @@ static void control_task(void *arg)
     while (1)
     {
         led_manager_loop();
-        btn_manager_loop();
+        // btn_manager_loop();
         relay_manager_loop();
 
         control_on_off_scan();

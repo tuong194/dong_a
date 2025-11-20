@@ -4,9 +4,12 @@
 #include "stdint.h"
 #include "stdbool.h"
 
-#define NUM_CHECK_DETECH_MAX 150
-#define TIME_DETECT_ON 6000  // us
-#define TIME_DETECT_OFF 4800 // us
+#define DETECT_ZERO 0
+#if DETECT_ZERO
+    #define NUM_CHECK_DETECH_MAX 150
+    #define TIME_DETECT_ON 6000  // us
+    #define TIME_DETECT_OFF 4800 // us
+#endif
 
 typedef struct{
     bool flag_check_control;
