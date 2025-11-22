@@ -166,7 +166,7 @@ void handle_attributes_message_param_rd(cJSON *attributes_json)
 		if (cJSON_IsNumber(countdown_json))
 		{
 			ESP_LOGI("THINGSBOARD", "COUNTDOWN: %d second", countdown_json->valueint);
-            rd_set_countdown(0xff, countdown_json->valueint, ON);
+            if(countdown_json->valueint>0) rd_start_countdown(countdown_json->valueint, OFF);
 		}
 	}
 
@@ -176,7 +176,12 @@ void handle_attributes_message_param_rd(cJSON *attributes_json)
 		if (cJSON_IsNumber(stt_startup_json))
 		{
 			ESP_LOGI("THINGSBOARD", "STATUS STARTUP: %d", stt_startup_json->valueint);
-            rd_set_status_startup(stt_startup_json->valueint);
+            if(stt_startup_json->valueint <= 2){
+                rd_set_status_startup((stt_startup_t)stt_startup_json->valueint);
+                tb_publish_telemetry("{\"CompleteStatusStartup\":0}");
+            }else{
+                tb_publish_telemetry("{\"CompleteStatusStartup\":1}"); //error
+            }
 		}
 	}
 }

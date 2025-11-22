@@ -71,6 +71,9 @@ static void event_handler(void *arg, esp_event_base_t event_base,
                           "\n\tSSID     : %s\n\tPassword : %s",
                      (const char *)wifi_sta_cfg->ssid,
                      (const char *)wifi_sta_cfg->password);
+            if(TaskCheckTimeOut != NULL){
+                vTaskDelete(TaskCheckTimeOut);
+            }
             break;
         }
         case WIFI_PROV_CRED_FAIL:

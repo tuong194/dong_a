@@ -65,8 +65,7 @@ key_map_t key_map[] =
 
 keyID get_key_id(const char *key)
 {
-    uint8_t size_key_map = sizeof(key_map) / sizeof(key_map_t);
-    for (size_t i = 0; i < size_key_map; i++)
+    for (size_t i = 0; i < UNKNOWN_KEY; i++)
     {
         if (!strcmp(key, key_map[i].key))
         {
@@ -146,7 +145,7 @@ static int set_onoff_all(uint8_t onoff){
 
 int do_controlDev_handle(cJSON *reqJson)
 {
-    int rsp_stt = 0;
+    int rsp_stt = CODE_OK;
     cJSON *item = NULL;
     keyID key_id = 0;
     cJSON_ArrayForEach(item, reqJson)
@@ -281,13 +280,14 @@ int do_controlDev_handle(cJSON *reqJson)
 
         default:
             ESP_LOGE("DEVICE", "UNKNOWN KEY method \"controlDev\" ");
+            rsp_stt = CODE_FORMAT_ERROR;
             break;
         }
     }
     count_key_dim = 0;
     count_key_color = 0;
 
-    return CODE_OK;
+    return rsp_stt;
 }
 
 int do_add_home_handle(cJSON *reqJson){

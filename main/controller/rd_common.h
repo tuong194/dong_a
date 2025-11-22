@@ -3,6 +3,7 @@
 
 #include "LC8823.h"
 #include "Define.h"
+#include "esp_timer.h"
 
 #define TIME_DELAY_KICK_OUT        3500*1000
 #define TIMEOUT_SAVE_FLASH_CONFIG  3*1000*1000
@@ -30,7 +31,7 @@ typedef enum{
 }stt_startup_t;
 
 typedef struct{
-    int64_t time_start_countdown;
+    int64_t time_now_s;
     int64_t time_countdown_s;
     stt_target_coundown stt_target;
 }Countdown_t;
@@ -49,7 +50,9 @@ typedef struct{
 
 void start_check_save_flash(void);
 void control_set_onoff(uint8_t index, uint8_t stt);
-void rd_set_countdown(uint8_t index, int64_t time_s, stt_target_coundown target);
+esp_err_t rd_start_countdown(int64_t time_s, stt_target_coundown target);
+esp_err_t rd_stop_countdown(void);
+
 void rd_set_status_startup(stt_startup_t stt_startup);
 uint8_t get_stt_present(uint8_t index);
 void init_control_task(void);
