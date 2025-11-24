@@ -252,6 +252,13 @@ void rd_set_status_startup(stt_startup_t stt_startup)
     rd_write_flash(KEY_FLASH_CONFIG, &flash_config_value, sizeof(flash_config_value));
 }
 
+void reset_config_device(void)
+{
+    reset_wifi_prov_mgr();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    esp_restart();
+}
+
 static void btn_event_handle(void *arg, esp_event_base_t event_base, int32_t event_id, void *data)
 {
     if (event_base == BUTTON_EVENT_BASE)
@@ -281,20 +288,23 @@ static void btn_event_handle(void *arg, esp_event_base_t event_base, int32_t eve
             break;
         }
         case EVENT_BUTTON_CONFIG_WIFI:
+        {
             ESP_LOGI("COMMON", "event config wwifi");
             led_set_blink(ALL_LED, 7, 100);
             start_wifi_prov_mgr();
             break;
+        }
         case EVENT_BUTTON_KICK_OUT:
+        {
             ESP_LOGI("BTN_MANAGER", "KICK OUT !!!");
+            device_rsp_reset_homId();
             lc8823_blink_led(ALL_LED, 11, 300);
-            reset_wifi_prov_mgr();
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-            esp_restart();
+            reset_config_device();
             break;
+        }
         case EVENT_BUTTON_INC_COUNT_KICK_OUT:
             ESP_LOGI("COMMON", "event increase kick out");
-            led_set_blink(ALL_LED, 3, 300);
+            led_set_blink(ALL_LED, 5, 300);
             break;
         default:
             ESP_LOGE("COMMON", "UNKNOW EVENT_ID BUTTON_EVENT_BASE");

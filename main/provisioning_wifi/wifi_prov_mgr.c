@@ -360,7 +360,6 @@ void check_provisioning_status(void)
     {
         ESP_LOGW(TAG, "Device is provisioned");
         wifi_init_sta_mode();
-
         // wifi_config_t sta_cfg = {0};
         // ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &sta_cfg));
         // memcpy(ssid_config, sta_cfg.sta.ssid, sizeof(sta_cfg.sta.ssid));

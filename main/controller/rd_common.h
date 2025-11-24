@@ -45,7 +45,6 @@ typedef struct{
 
 /**
  * @brief hàm kiểm tra và bắt đầu quá trình lưu cấu hình vào flash
- * 
  */
 void start_check_save_flash(void);
 
@@ -65,11 +64,35 @@ void control_set_onoff(uint8_t index, uint8_t stt);
  * @return esp_err_t: trả về kiểu esp_err_t
  */
 esp_err_t rd_start_countdown(int64_t time_s, stt_target_coundown target);
+
+/**
+ * @brief hàm dừng bộ đếm timer cho countdown
+ */
 esp_err_t rd_stop_countdown(void);
 
-
+/**
+ * @brief hàm cài đặt trạng thái khởi động cho toàn bộ các element
+ * 
+ * @param stt_startup trạng thái khởi động
+ */
 void rd_set_status_startup(stt_startup_t stt_startup);
+
+/**
+ * @brief hàm lấy ra trạng thái nút nhấn hiện tại
+ * 
+ * @param index chỉ số phần tử
+ * @return trả về trạng thái hiện tại của element index (ON_STT/ OFF_STT)
+ */
 uint8_t get_stt_present(uint8_t index);
+
+/**
+ * @brief hàm khởi tạo task controller
+ */
 void init_control_task(void);
+
+/**
+ * @brief hàm reset lại toàn bộ cấu hình thiết bị
+ */
+void reset_config_device(void);
 
 #endif /*  */

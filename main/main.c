@@ -19,5 +19,4 @@ void app_main(void)
 	init_control_task();
 	init_wifi_provision();
 	tb_init();
-	
 }

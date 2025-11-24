@@ -343,7 +343,7 @@ int do_del_home_handle(cJSON *reqJson){
         if(strcmp(mac, config.mac) == 0 && strcmp(homeId, config.home_id) == 0){
             ESP_LOGW(TAG_DEVICE, "xoa nha");
             Config_SetHomeId(HOME_ID_DEFAULT);
-			
+			reset_config_device();
             return CODE_OK;
         }else{
             ESP_LOGE(TAG_DEVICE, "check mac or homeID fail");
