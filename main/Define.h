@@ -70,13 +70,13 @@
 #define KEY_HOME_ID "dormitoryId"
 
 #if NUM_ELEMENT == 1
-#define DEVICE_NAME "Congtac1nut_"
+#define DEVICE_NAME_PREFIX "Congtac1nut_"
 #elif NUM_ELEMENT == 2
-#define DEVICE_NAME "Congtac2nut_"
+#define DEVICE_NAME_PREFIX "Congtac2nut_"
 #elif NUM_ELEMENT == 3
-#define DEVICE_NAME "Congtac3nut_"
+#define DEVICE_NAME_PREFIX "Congtac3nut_"
 #elif NUM_ELEMENT == 4
-#define DEVICE_NAME "Congtac4nut_"
+#define DEVICE_NAME_PREFIX "Congtac4nut_"
 #endif
 
 #define DEVICE_TYPE     6262

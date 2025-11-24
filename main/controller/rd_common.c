@@ -184,15 +184,15 @@ static void countdown_cb(void *args)
     if (countdown_val.time_now_s >= countdown_val.time_countdown_s)
     {
         for (uint8_t i = 0; i < NUM_ELEMENT; i++)
-        {
+        { 
             printf("set stt onoff countdown element : %x\n", i);
             switch (countdown_val.stt_target)
             {
             case OFF:
-                control_set_onoff(i, 0);
+                control_set_onoff(i, OFF_STT);
                 break;
             case ON:
-                control_set_onoff(i, 1);
+                control_set_onoff(i, ON_STT);
                 break;
             case TONGLE:
                 control_set_onoff(i, !on_off_val[i].present);

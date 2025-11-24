@@ -13,11 +13,6 @@ struct on_off_t{
     uint8_t target;
 };
 
-typedef struct {
-    uint8_t ele_cnt;
-    uint8_t target;
-}rd_queue_led_relay;
-
 typedef enum{
     OFF = 0,
     ON,
@@ -48,10 +43,30 @@ typedef struct{
     int64_t time_start_save_flash;
 }save_flash_check_t;
 
+/**
+ * @brief hàm kiểm tra và bắt đầu quá trình lưu cấu hình vào flash
+ * 
+ */
 void start_check_save_flash(void);
+
+/**
+ * @brief hàm điều khiển on off 
+ * 
+ * @param index: chỉ số phần tử các element, bắt đầu từ 0
+ * @param stt: trạng thái on off
+ */
 void control_set_onoff(uint8_t index, uint8_t stt);
+
+/**
+ * @brief hàm khởi động bộ đếm ngược
+ * 
+ * @param time_s: thời gian đếm ngược (giây)
+ * @param target: trạng thái mục tiêu khi kết thúc đếm ngược 
+ * @return esp_err_t: trả về kiểu esp_err_t
+ */
 esp_err_t rd_start_countdown(int64_t time_s, stt_target_coundown target);
 esp_err_t rd_stop_countdown(void);
+
 
 void rd_set_status_startup(stt_startup_t stt_startup);
 uint8_t get_stt_present(uint8_t index);

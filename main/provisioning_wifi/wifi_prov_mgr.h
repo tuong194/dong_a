@@ -6,16 +6,16 @@
 #define PROV_TRANSPORT_SOFTAP       "softap"
 #define PROV_TRANSPORT_BLE          "ble"
 
-#define PROV_SEC1_PWD               "123456"
-#define RD_HEADER_SSID_WIFI_SOFTAP  "SW_"       
-#define RD_PASS_WIFI_SOFTAP         "RDSMART@2804"
+#define PROV_SEC1_PWD               "123456" //donga2025@
+#define RD_HEADER_SSID_WIFI_SOFTAP  "SW_" //DONGA_      
+#define RD_PASS_WIFI_SOFTAP         "RDSMART@2804" //Donga2025@
 #define RD_RESET_PROV_MGR_ON_FAILURE 1
 #define PROV_MGR_MAX_RETRY_CNT  3
 
 // #define RD_PROV_TRANSPORT_BLE        1
 // #define RD_PROV_TRANSPORT_SOFTAP     0
 // #define RD_CONFIG_PROV_TRANSPORT     RD_PROV_TRANSPORT_BLE
-#define TIMEOUT_NETWORK_CONFIGURATION   3*60*1000*1000
+#define TIMEOUT_NETWORK_CONFIGURATION   5*60*1000*1000
 
 typedef enum{
     TRANSPORT_BLE,

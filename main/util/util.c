@@ -19,6 +19,15 @@ void get_mac_str(char *mac_str)
 					mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }
 
+char *get_device_name(const char *prefix)
+{
+	static char device_name[20] = {0};
+	uint8_t mac[6] = {0};
+	ESP_ERROR_CHECK(esp_read_mac(mac, ESP_MAC_WIFI_STA));
+	sprintf(device_name, "%s%02x%02x%02x%02x%02x%02x",prefix, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	return device_name;
+}
+
 char *ConvertToCharLower(char *str)
 {
 	int i = 0;

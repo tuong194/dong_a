@@ -71,8 +71,10 @@ static void event_handler(void *arg, esp_event_base_t event_base,
                           "\n\tSSID     : %s\n\tPassword : %s",
                      (const char *)wifi_sta_cfg->ssid,
                      (const char *)wifi_sta_cfg->password);
+            
             if(TaskCheckTimeOut != NULL){
                 vTaskDelete(TaskCheckTimeOut);
+                TaskCheckTimeOut = NULL;
             }
             break;
         }
@@ -124,7 +126,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
             wifi_config_t sta_cfg = {0};
             ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &sta_cfg));
             ESP_LOGW(TAG, "SSID: %s", sta_cfg.sta.ssid);
-            ESP_LOGW(TAG, "Password: %s", sta_cfg.sta.password);
+            ESP_LOGW(TAG, "PASSWORD: %s", sta_cfg.sta.password);
             esp_wifi_connect();
             break;
         }
@@ -359,10 +361,10 @@ void check_provisioning_status(void)
         ESP_LOGW(TAG, "Device is provisioned");
         wifi_init_sta_mode();
 
-        wifi_config_t sta_cfg = {0};
-        ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &sta_cfg));
-        memcpy(ssid_config, sta_cfg.sta.ssid, sizeof(sta_cfg.sta.ssid));
-        memcpy(pass_config, sta_cfg.sta.password, sizeof(sta_cfg.sta.password));
+        // wifi_config_t sta_cfg = {0};
+        // ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &sta_cfg));
+        // memcpy(ssid_config, sta_cfg.sta.ssid, sizeof(sta_cfg.sta.ssid));
+        // memcpy(pass_config, sta_cfg.sta.password, sizeof(sta_cfg.sta.password));
     }
 }
 void stop_wifi_prov_mgr(void)
@@ -408,7 +410,9 @@ static void time_out_prov_task(void *param){
             ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
             ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_cfg));
             ESP_ERROR_CHECK(esp_wifi_start());       
-            vTaskDelete(NULL);     
+            TaskHandle_t handle = TaskCheckTimeOut;
+            TaskCheckTimeOut = NULL; 
+            vTaskDelete(handle);      
         }
         vTaskDelay(pdMS_TO_TICKS(100));
     }
@@ -425,10 +429,15 @@ static void wifi_connected_task(void *param)
         if (bits & WIFI_CONNECTED_EVENT)
         {
             wifi_config_t sta_cfg = {0};
+            // if(TaskCheckTimeOut != NULL){
+            //     vTaskDelete(TaskCheckTimeOut);
+            //     TaskCheckTimeOut = NULL;
+            // }
             ESP_ERROR_CHECK(esp_wifi_get_config(WIFI_IF_STA, &sta_cfg));
             ESP_LOGI(TAG, "connected to wifi sta");
             ESP_LOGW(TAG, "ssid: %s", sta_cfg.sta.ssid);
             ESP_LOGW(TAG, "pass: %s", sta_cfg.sta.password);
+            memcpy(config.ssid_config, sta_cfg.sta.ssid, sizeof(sta_cfg.sta.ssid));
             memcpy(ssid_config, sta_cfg.sta.ssid, sizeof(sta_cfg.sta.ssid));
             memcpy(pass_config, sta_cfg.sta.password, sizeof(sta_cfg.sta.password));
             rd_connect_tb();

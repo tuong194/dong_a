@@ -88,7 +88,8 @@ void Config_Print() {
 
 static void Get_Mac_Device(void){
     uint8_t mac_esp[6] = {0};
-    esp_efuse_mac_get_default(mac_esp);
+    // esp_efuse_mac_get_default(mac_esp);
+    esp_read_mac(mac_esp, ESP_MAC_WIFI_STA);
    
     sprintf(config.mac, "%02x%02x%02x%02x%02x%02x", mac_esp[0], mac_esp[1], mac_esp[2], mac_esp[3], mac_esp[4], mac_esp[5]);
     printf("config mac: %s\n", config.mac);

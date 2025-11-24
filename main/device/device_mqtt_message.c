@@ -7,6 +7,7 @@
 #include "rd_common.h"
 #include "tb.h"
 #include "rd_config.h"
+#include "util.h"
 
 #include "Define.h"
 
@@ -64,7 +65,7 @@ int rpc_callback_add_home(cJSON *reqJson, cJSON *respJson){
     get_all_key_value(reqJson, data_param);
     cJSON_AddNumberToObject(data_param, "code", rsp);
     cJSON_AddNumberToObject(data_param, KEY_TYPE, DEVICE_TYPE);
-    cJSON_AddStringToObject(data_param, KEY_NAME, DEVICE_NAME);
+    cJSON_AddStringToObject(data_param, KEY_NAME, get_device_name(DEVICE_NAME_PREFIX));
     cJSON_AddStringToObject(data_param, KEY_VERSION, DEVICE_VERSION);
     cJSON_AddStringToObject(data_param, KEY_IP, config.ip);
     cJSON_AddStringToObject(data_param, KEY_NAME_WIFI, config.ssid_config);
@@ -130,7 +131,7 @@ int device_publish_info(void){
     cJSON *pubJson = cJSON_CreateObject();
     cJSON_AddStringToObject(pubJson, KEY_MAC, config.mac);
     cJSON_AddNumberToObject(pubJson, KEY_TYPE, DEVICE_TYPE);
-    cJSON_AddStringToObject(pubJson, KEY_NAME, DEVICE_NAME);
+    cJSON_AddStringToObject(pubJson, KEY_NAME, get_device_name(DEVICE_NAME_PREFIX));
     cJSON_AddStringToObject(pubJson, KEY_VERSION, DEVICE_VERSION);
     cJSON_AddStringToObject(pubJson, KEY_IP, config.ip);
     cJSON_AddStringToObject(pubJson, KEY_NAME_WIFI, config.ssid_config);

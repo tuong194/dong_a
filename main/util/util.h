@@ -8,6 +8,7 @@
 
 uint8_t rd_exceed_us(int64_t ref, int64_t span_us);
 void get_mac_str(char *mac_str);
+char *get_device_name(const char *prefix);
 char *ConvertToCharLower(char *str);
 char *hex_to_ascii(char *hex_string);
 
