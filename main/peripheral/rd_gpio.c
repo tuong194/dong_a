@@ -3,8 +3,34 @@
 #include "freertos/queue.h"
 #include "driver/gpio.h"
 
-gpio_num_t BUTTON_PIN_ARR[NUM_ELEMENT] = {BUTTON_PIN1, BUTTON_PIN2, BUTTON_PIN3, BUTTON_PIN4};
-gpio_num_t RELAY_PIN_ARR[NUM_ELEMENT] = {RELAY1_PIN, RELAY2_PIN, RELAY3_PIN, RELAY4_PIN};
+gpio_num_t BUTTON_PIN_ARR[NUM_ELEMENT] = {
+    #ifdef BTN_1
+        BUTTON_PIN1
+    #endif
+    #ifdef BTN_2
+        ,BUTTON_PIN2
+    #endif
+    #ifdef BTN_3
+        ,BUTTON_PIN3
+    #endif
+    #ifdef BTN_4
+        ,BUTTON_PIN4
+    #endif
+};
+gpio_num_t RELAY_PIN_ARR[NUM_ELEMENT] = {
+    #ifdef BTN_1
+        RELAY1_PIN 
+    #endif
+    #ifdef BTN_2
+        ,RELAY2_PIN
+    #endif
+    #ifdef BTN_3
+        ,RELAY3_PIN
+    #endif
+    #ifdef BTN_4
+        ,RELAY4_PIN
+    #endif
+};
 
 static QueueHandle_t gpio_evt_queue = NULL;
 void IRAM_ATTR gpio_isr_handler(void *arg) // send data from ISR to QUEUE

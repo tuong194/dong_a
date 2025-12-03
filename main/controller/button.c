@@ -11,16 +11,11 @@
 ESP_EVENT_DEFINE_BASE(BUTTON_EVENT_BASE);
 static esp_event_loop_handle_t btn_event_loop;
 static button_param_t button_para[NUM_ELEMENT] = {0};
-static uint8_t number_btn_hold = 0;
-static uint8_t index_btn = 0;
 static int64_t time_start_hold = 0;
+static uint8_t index_btn = 0;
 
 extern uint8_t get_flag_pair_onoff(void);
 
-static inline uint8_t get_num_btn_hold(void)
-{
-    return number_btn_hold;
-}
 
 static inline void clear_flag_press_one_btn(uint8_t index)
 {
@@ -34,15 +29,32 @@ static bool check_press_one_btn(uint8_t index)
         clear_flag_press_one_btn(index);
         return true;
     }
-    return button_para[index].check_press_flag;
+    return false;
 }
-static inline bool check_hold_one_btn(uint8_t index)
+static inline uint8_t btn_is_keeping(uint8_t index)
 {
     return button_para[index].check_keep_flag;
 }
-static inline void clear_flag_hold_one_btn(uint8_t index)
+static inline void clear_check_keep(uint8_t index)
 {
-    button_para[index].check_keep_flag = false;
+    button_para[index].check_keep_flag = 0;
+}
+
+static inline uint8_t get_num_btn_keeping(){
+    uint8_t number = 0;
+    #if NUM_ELEMENT >= 1
+        number += btn_is_keeping(BTN_1);
+    #endif
+    #if NUM_ELEMENT >= 2
+        number += btn_is_keeping(BTN_2);
+    #endif
+    #if NUM_ELEMENT >= 3
+        number += btn_is_keeping(BTN_3);
+    #endif
+    #if NUM_ELEMENT >= 4
+        number += btn_is_keeping(BTN_4);
+    #endif
+    return number;
 }
 
 static void scan_one_btn(uint8_t index)
@@ -51,11 +63,11 @@ static void scan_one_btn(uint8_t index)
     {
         button_para[index].count_buff_scan++;
 
-        if (button_para[index].count_buff_scan == COUNT_CYCLE_ACTIVE_BTN)
+        if (button_para[index].count_buff_scan == COUNT_CYCLE_ACTIVE_BTN && button_para[index].btn_count_check == 0)
         {
             button_para[index].btn_count_check = 1;
         }
-        else if (button_para[index].count_buff_scan > COUNT_CYCLE_ACTIVE_BTN)
+        else if ((button_para[index].count_buff_scan > COUNT_CYCLE_ACTIVE_BTN) || (button_para[index].btn_count_check > 1))
         {
             button_para[index].btn_count_check += 1;
         }
@@ -69,24 +81,30 @@ static void scan_one_btn(uint8_t index)
     {
         button_para[index].button_stt = But_Press;
     }
-    else if (button_para[index].btn_count_check >= TIME_COUNT_HOLD && button_para[index].button_stt == But_Press)
+    else if (button_para[index].btn_count_check >= TIME_COUNT_KEEP && button_para[index].button_stt == But_Press)
     {
-        printf("button %u is holding\n", index + 1);
-        time_start_hold = esp_timer_get_time();
+        printf("button %u is keeping\n", index + 1);
         button_para[index].button_stt = But_Keeping;
-        button_para[index].check_keep_flag = true;
-        number_btn_hold++;
-        printf("num btn hold %u\n", number_btn_hold);
+        button_para[index].check_keep_flag = 1;
+        get_tick_time(&time_start_hold);
     }
+    else if (button_para[index].btn_count_check >= TIME_COUNT_LONG_KEEP && button_para[index].button_stt == But_Keeping)
+    {
+        printf("button %u is long keeping\n", index + 1);
+        button_para[index].check_keep_flag = 0;
+        button_para[index].button_stt = But_Long_Keeping;      
+    }
+
     else if (button_para[index].btn_count_check == 0)
     {
-        if (button_para[index].button_stt == But_Keeping)
+        if(button_para[index].button_stt == But_Long_Keeping){
+            printf("release long keeping btn %u\n", index + 1);
+
+        }
+        else if (button_para[index].button_stt == But_Keeping)
         {
-            printf("release btn %u\n", index + 1);
-            time_start_hold = esp_timer_get_time();
-            if (number_btn_hold > 0)
-                number_btn_hold--;
-            printf("num btn hold %u\n", number_btn_hold);
+            button_para[index].check_keep_flag = 0;
+            get_tick_time(&time_start_hold);
         }
         else if (button_para[index].button_stt == But_Press)
         {
@@ -94,8 +112,7 @@ static void scan_one_btn(uint8_t index)
             button_para[index].check_press_flag = true;
         }
         button_para[index].button_stt = But_None;
-        clear_flag_hold_one_btn(index);
-        // check_keep_flag = false;
+        clear_check_keep(index);
     }
 }
 
@@ -130,44 +147,65 @@ int btn_check_press(void)
 
 int btn_check_keeping(){
     static uint8_t count_kick_out = 0;
-    if(get_num_btn_hold() == 1){
+#if NUM_ELEMENT == 1
+    if(button_para[BUTTON_CONFIG_WIFI_1].button_stt == But_Long_Keeping){
+        esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
+        button_para[BUTTON_CONFIG_WIFI_1].button_stt = But_None;
+        return 1;
+    }
+#else
+    if(button_para[BUTTON_CONFIG_WIFI_1].button_stt == But_Long_Keeping && button_para[BUTTON_CONFIG_WIFI_2].button_stt == But_Long_Keeping){
+        button_para[BUTTON_CONFIG_WIFI_1].button_stt = But_None;
+        button_para[BUTTON_CONFIG_WIFI_2].button_stt = But_None;
+        esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
+        return 1;
+    }
+#endif
+    if(get_num_btn_keeping() == 1 && rd_exceed_us(time_start_hold, TIME_CYCLE_SET_PAIR)){
         for (uint8_t i = 0; i < NUM_ELEMENT; i++)
         {
-            if (check_hold_one_btn(i) && rd_exceed_us(time_start_hold, TIME_CYCLE_SET_PAIR))
+            if (btn_is_keeping(i))
             {
                 index_btn = i;
-                time_start_hold = esp_timer_get_time();
+                clear_check_keep(i);
                 esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_PAIR_K9B, &index_btn, 1, portMAX_DELAY);
-                return 0;
+#if NUM_ELEMENT == 1
+                count_kick_out++;
+                if (count_kick_out >= 3)
+                {
+                    count_kick_out = 0;
+                    esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_KICK_OUT, NULL, 0, portMAX_DELAY);
+                    return 3;
+                }
+                esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_INC_COUNT_KICK_OUT, NULL, 0, portMAX_DELAY);
+#endif
+                return 1;
             }
-        }
-    }else if(get_num_btn_hold() == 2){
-        if(check_hold_one_btn(BTN_3) && check_hold_one_btn(BTN_4) && rd_exceed_us(time_start_hold, TIME_CYCLE_CONFIG_WIFI)){
-            time_start_hold = esp_timer_get_time();
-            clear_flag_hold_one_btn(BTN_3);
-            clear_flag_hold_one_btn(BTN_4);
-            esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
-            return 0;
-        }
-        if(check_hold_one_btn(BTN_1) && check_hold_one_btn(BTN_2) && rd_exceed_us(time_start_hold, TIME_CYCLE_KICK_OUT)){
-            time_start_hold = esp_timer_get_time();
-            clear_flag_hold_one_btn(BTN_1);
-            clear_flag_hold_one_btn(BTN_2);
-            count_kick_out++;
-            if (count_kick_out == 3)
-            {
-                count_kick_out = 0;
-                esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_KICK_OUT, NULL, 0, portMAX_DELAY);
-                return 3;
-            }
-            esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_INC_COUNT_KICK_OUT, NULL, 0, portMAX_DELAY);
-            return 1;
         }
     }
+#if NUM_ELEMENT > 1
+    else if(get_num_btn_keeping() == 2 && rd_exceed_us(time_start_hold, TIME_CYCLE_KICK_OUT)){
+        for (size_t i = 0; i < NUM_ELEMENT; i++)
+        {
+            if (btn_is_keeping(i))
+            {
+                clear_check_keep(i);
+            }
+        }
+        count_kick_out++;
+        if (count_kick_out >= 3)
+        {
+            count_kick_out = 0;
+            esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_KICK_OUT, NULL, 0, portMAX_DELAY);
+            return 3;
+        }
+        esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_INC_COUNT_KICK_OUT, NULL, 0, portMAX_DELAY);
+        return 1;
+    }
+#endif
     if (count_kick_out > 0 && rd_exceed_us(time_start_hold, TIME_OUT_KICK_OUT))
     {
         count_kick_out = 0;
-        time_start_hold = esp_timer_get_time();
         ESP_LOGW("BTN_MANAGER", "time out kick out, reset count");
         return 0;
     }    

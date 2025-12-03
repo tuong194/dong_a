@@ -5,7 +5,9 @@
 #include "util.h"
 #include "esp_timer.h"
 
+#if DETECT_ZERO
 static int64_t last_time_crl_relay = 0;
+#endif
 static relay_stt_t relay_stt[NUM_ELEMENT] = {0};
 
 void set_stt_relay(uint8_t index, uint8_t stt)

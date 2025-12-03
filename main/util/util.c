@@ -11,6 +11,10 @@ uint8_t rd_exceed_us(int64_t ref, int64_t span_us)
     return (esp_timer_get_time() - ref) >= span_us;
 }
 
+void get_tick_time(int64_t *ref){
+	*ref = esp_timer_get_time();
+}
+
 void get_mac_str(char *mac_str)
 {
 	uint8_t mac[6] = {0};

@@ -7,6 +7,8 @@
 #define SLEEP_US(us)     esp_rom_delay_us(us)
 
 uint8_t rd_exceed_us(int64_t ref, int64_t span_us);
+void get_tick_time(int64_t *ref);
+
 void get_mac_str(char *mac_str);
 char *get_device_name(const char *prefix);
 char *ConvertToCharLower(char *str);
