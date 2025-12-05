@@ -330,7 +330,11 @@ static void control_task(void *arg)
     }
 }
 
+extern void test_gpio_init();
+extern esp_err_t button_gpio_config(void);
 void init_control_task(void)
 {
-    xTaskCreate(control_task, "control_task", 2048 * 2, NULL, configMAX_PRIORITIES - 3, NULL);
+    test_gpio_init();
+    button_gpio_config();
+    //xTaskCreate(control_task, "control_task", 2048 * 2, NULL, configMAX_PRIORITIES - 3, NULL);
 }

@@ -42,16 +42,16 @@ static inline void clear_check_keep(uint8_t index)
 
 static inline uint8_t get_num_btn_keeping(){
     uint8_t number = 0;
-    #if NUM_ELEMENT >= 1
+    #ifdef BTN_1
         number += btn_is_keeping(BTN_1);
     #endif
-    #if NUM_ELEMENT >= 2
+    #ifdef BTN_2
         number += btn_is_keeping(BTN_2);
     #endif
-    #if NUM_ELEMENT >= 3
+    #ifdef BTN_3
         number += btn_is_keeping(BTN_3);
     #endif
-    #if NUM_ELEMENT >= 4
+    #ifdef BTN_4
         number += btn_is_keeping(BTN_4);
     #endif
     return number;

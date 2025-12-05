@@ -81,3 +81,9 @@ void rd_gpio_init(void)
     gpio_set_level(RESET_TOUCH_PIN, TOUCH_ACTIVE_POW);
     gpio_set_level(LED_CLK, 1);
 }
+
+void test_gpio_init(){
+  gpio_set_pin_output(RESET_TOUCH_PIN);
+  gpio_set_level(RESET_TOUCH_PIN, TOUCH_ACTIVE_POW);
+
+}

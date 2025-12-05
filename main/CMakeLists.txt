@@ -10,9 +10,9 @@ file(GLOB srcs
     "mqtt/*.c" 
     "ota/*.c"
     "tb/*.c"
-    "util/*.c"
+    "util/*.c" 
     "rd_config/*.c"
-    "*.c"
+    "*.c" 
 )
 
 set(incs
