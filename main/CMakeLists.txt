@@ -8,14 +8,14 @@ file(GLOB srcs
     "peripheral/*.c"
     "wifi/*.c"
     "mqtt/*.c" 
-    "ota/*.c"
+    "ota/*.c" 
     "tb/*.c"
     "util/*.c" 
     "rd_config/*.c"
     "*.c" 
 )
 
-set(incs
+set(incs 
     "device"
     "K9B_Remote"
     "provisioning_wifi"

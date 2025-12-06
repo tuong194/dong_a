@@ -3,7 +3,7 @@
 #include "esp_log.h"
 
 #include "rd_gpio.h"
-#include "button.h"
+#include "button_manager.h"
 #include "relay.h"
 #include "rd_common.h"
 #include "device.h"
@@ -31,8 +31,9 @@ static void common_init(void)
 {
     rd_gpio_init();
     led_manager_init();
+    button_gpio_config();
     btn_event_init(btn_event_handle);
-    button_manager_init();
+    // button_manager_init();
 }
 
 static void init_value_config_default(void)
@@ -281,10 +282,12 @@ static void btn_event_handle(void *arg, esp_event_base_t event_base, int32_t eve
         }
         case EVENT_BUTTON_DELETE_ALL_K9B:
         {
-            uint8_t index = *(uint8_t *)data;
-            K9B_delete_all_onoff_one_btn(index);
-            K9B_Pair_OnOff_ClearFlag();
-            led_set_blink(index, 11, 300);
+            if(get_flag_pair_onoff()){
+                uint8_t index = *(uint8_t *)data;
+                K9B_delete_all_onoff_one_btn(index);
+                K9B_Pair_OnOff_ClearFlag();
+                led_set_blink(index, 11, 300);
+            }
             break;
         }
         case EVENT_BUTTON_CONFIG_WIFI:
@@ -330,11 +333,7 @@ static void control_task(void *arg)
     }
 }
 
-extern void test_gpio_init();
-extern esp_err_t button_gpio_config(void);
 void init_control_task(void)
 {
-    test_gpio_init();
-    button_gpio_config();
-    //xTaskCreate(control_task, "control_task", 2048 * 2, NULL, configMAX_PRIORITIES - 3, NULL);
+    xTaskCreate(control_task, "control_task", 2048 * 2, NULL, configMAX_PRIORITIES - 3, NULL);
 }

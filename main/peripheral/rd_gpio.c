@@ -71,7 +71,7 @@ void rd_gpio_init(void)
 {
     for (uint8_t i = 0; i < NUM_ELEMENT; i++)
     {
-        gpio_set_pin_input(BUTTON_PIN_ARR[i], GPIO_INTR_DISABLE);
+        // gpio_set_pin_input(BUTTON_PIN_ARR[i], GPIO_INTR_DISABLE);
         gpio_set_pin_output(RELAY_PIN_ARR[i]);
     }
     gpio_set_pin_output(LED_DATA);

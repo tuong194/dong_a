@@ -9,6 +9,7 @@
 #define ON_STT     1
 
 #define NUM_ELEMENT   4
+#define BTN_NUM       NUM_ELEMENT
 
 #define TOUCH_ACTIVE_POW			0
 #define TOUCH_NON_ACTIVE_POW		1
