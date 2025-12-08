@@ -17,6 +17,6 @@ void app_main(void)
 	init_ble_adv();
 	K9B_init_task();
 	init_control_task();
-	// init_wifi_provision();
-	// tb_init();
+	init_wifi_provision();
+	tb_init();
 }

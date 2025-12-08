@@ -260,9 +260,9 @@ static void K9B_task(void *arg)
 			uint32_t macaddr = (rx_data_adv.mac[3] << 24) | (rx_data_adv.mac[2] << 16) | (rx_data_adv.mac[1] << 8) | rx_data_adv.mac[0];
 			if (((switchKP9_proxy->counter != count_last) || (mac_last != macaddr)) && ((switchKP9_proxy->key & 0x80) != 0x80))
 			{
-				printf("mac: %02X-%02X-%02X-%02X-%02X-%02X---rssi: %d\n", rx_data_adv.mac[5], rx_data_adv.mac[4], rx_data_adv.mac[3],
-					   rx_data_adv.mac[2], rx_data_adv.mac[1], rx_data_adv.mac[0], rx_data_adv.rssi);
-				printf("counter : %lu, key value: %02X \n", switchKP9_proxy->counter, switchKP9_proxy->key);
+				// printf("mac: %02X-%02X-%02X-%02X-%02X-%02X---rssi: %d\n", rx_data_adv.mac[5], rx_data_adv.mac[4], rx_data_adv.mac[3],
+				// 	   rx_data_adv.mac[2], rx_data_adv.mac[1], rx_data_adv.mac[0], rx_data_adv.rssi);
+				// printf("counter : %lu, key value: %02X \n", switchKP9_proxy->counter, switchKP9_proxy->key);
 
 				count_last = switchKP9_proxy->counter;
 				mac_last = macaddr;

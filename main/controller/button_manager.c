@@ -138,37 +138,40 @@ esp_err_t button_gpio_config(void){
 
 static void board_button_event_cb(void *arg, void *data){
     button_handle_t btn_handler = (button_handle_t) arg;
-    button_info_t *btn_info = (button_info_t *)data;
+    button_info_t *btn = (button_info_t *)data;
     button_event_t event = board_get_event(btn_handler);
     switch (event)
     {
     case BUTTON_EVENT_PRESS:
-        esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_PRESS, &btn_info->element, 1, portMAX_DELAY);
-        printf("[BTN]: index pair: %d - cur: %d\n",btn_index_pair, btn_info->element);
-        if(btn_index_pair == btn_info->element){
-            
-            esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_DELETE_ALL_K9B, &btn_info->element, 1, portMAX_DELAY);
+        esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_PRESS, &btn->element, 1, portMAX_DELAY);
+        if(btn_index_pair == btn->element){
+            esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_DELETE_ALL_K9B, &btn->element, 1, portMAX_DELAY);
             btn_index_pair = 0xff;
         }
         break;
     case BUTTON_EVENT_KEEPING:{
-        btn_info->is_keeping = 1;
+        btn->is_keeping = 1;
         get_tick_time(&time_out_get_tick);
         break;
     }
     case BUTTON_EVENT_RELEASE_KEEPING:{
-        printf("[BOARD] btn %d release keeping\n",btn_info->element + 1);
-        btn_info->is_keeping = 0;
+        printf("[BOARD] btn %d release keeping\n",btn->element + 1);
+        btn->is_keeping = 0;
+        get_tick_time(&time_out_get_tick);
         break;
     }
     case BUTTON_EVENT_LONG_KEEPING:{
-        btn_info->is_keeping = 0;
-        btn_info->is_long_keeping = 1;
+        btn->is_keeping = 0;
+        btn->is_long_keeping = 1;
 #if BTN_NUM == 1
         if(btn_info[BTN_1].is_long_keeping == 1){
             esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
         }
 #else
+        printf("[BOARD] btn %d is long keeping\n",btn->element + 1);
+        if(btn_info[BTN_1].is_long_keeping == 1) printf("[BOARD] btn 1 long keeping\n");
+        if(btn_info[BTN_2].is_long_keeping == 1) printf("[BOARD] btn 2 long keeping\n");
+
         if(btn_info[BTN_1].is_long_keeping == 1 && btn_info[BTN_2].is_long_keeping == 1){
             esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
         }
@@ -176,8 +179,8 @@ static void board_button_event_cb(void *arg, void *data){
         break;
     }
     case BUTTON_EVENT_RELEASE_LONG_KEEPING:
-        btn_info->is_long_keeping = 0;
-        printf("[BOARD] btn %d release long keeping\n",btn_info->element + 1);
+        btn->is_long_keeping = 0;
+        printf("[BOARD] btn %d release long keeping\n",btn->element + 1);
         break;
     
     default:
@@ -216,7 +219,7 @@ static void button_manager_cb(void *args){
     else if(get_num_btn_keeping() == 2 && rd_exceed_us(time_out_get_tick, CLOCK_TIME_KICK_OUT)){
         for (size_t i = 0; i < BTN_NUM; i++)
         {
-            if(btn_is_keeping(i)) clear_check_keep(1);          
+            if(btn_is_keeping(i)) clear_check_keep(i);          
         }
         count_kick_out++;
         if(count_kick_out >= 3){
