@@ -40,6 +40,7 @@ typedef enum
     But_Long_Keeping = 0x03U
 }button_stt_t;
 
+void button_reset_touch_pin_config(gpio_num_t RST_TOUCH_PIN, uint8_t active_level);
 button_handle_t board_create_button_gpio(const button_config_t *config);
 esp_err_t board_register_callback(button_handle_t btn_handle, button_event_t event, button_cb_t cb, void *usr_data);
 button_event_t board_get_event(button_handle_t btn_handle);

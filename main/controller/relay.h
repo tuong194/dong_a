@@ -1,22 +1,25 @@
-#ifndef _RELAY_H__
-#define _RELAY_H__
+#ifndef _RD_RELAY_H__
+#define _RD_RELAY_H__
 
+#include "soc/gpio_num.h"
 #include "stdint.h"
 #include "stdbool.h"
 
-#define DETECT_ZERO 0
-#if DETECT_ZERO
-    #define NUM_CHECK_DETECH_MAX 150
-    #define TIME_DETECT_ON 6000  // us
-    #define TIME_DETECT_OFF 4800 // us
-#endif
+typedef enum {
+    RELAY_ACTIVE_HIGH = 1,
+    RELAY_ACTIVE_LOW  = 0
+} relay_active_t;
 
-typedef struct{
-    bool flag_check_control;
-    uint8_t stt_relay ;
-}relay_stt_t;
+typedef struct {
+    uint8_t element;
+    gpio_num_t gpio_pin;
+    relay_active_t active_level;
+    uint8_t state;
+    bool is_control;
+}relay_t;
 
-void set_stt_relay(uint8_t index, uint8_t stt);
-void relay_manager_loop(void);
+void set_state_relay(uint8_t index, uint8_t state);
+void relay_gpio_config(void);
+void relay_handler(void);
 
-#endif /* RELAY_H_ */
+#endif /*  */

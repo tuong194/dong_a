@@ -1,8 +1,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "err_code.h"
 
-#include "rd_gpio.h"
 #include "button_manager.h"
 #include "relay.h"
 #include "rd_common.h"
@@ -11,7 +11,6 @@
 #include "rd_flash.h"
 #include "util.h"
 #include "wifi_prov_mgr.h"
-#include "err_code.h"
 #include "rd_config.h"
 #include "tb.h"
 
@@ -29,8 +28,8 @@ save_flash_check_t flash_check_save = {
 
 static void common_init(void)
 {
-    rd_gpio_init();
     led_manager_init();
+    relay_gpio_config();
     button_gpio_config();
     btn_event_init(btn_event_handle);
     // button_manager_init();
@@ -89,7 +88,7 @@ static int load_data_from_flash(void)
         lc8823_set_color(i, OFF_STT, flash_config_value.led_value[i].OFF.red, flash_config_value.led_value[i].OFF.green, flash_config_value.led_value[i].OFF.blue); // rgb on
 
         lc8823_set_stt_led(i, on_off_val[i].present); // set stt led
-        set_stt_relay(i, on_off_val[i].present);
+        set_state_relay(i, on_off_val[i].present);
     }
     return CODE_OK;
 }
@@ -163,7 +162,7 @@ void control_on_off_scan(void)
             start_check_save_flash();
             on_off_val[i].present = on_off_val[i].target;
             lc8823_set_stt_led(i, on_off_val[i].present);
-            set_stt_relay(i, on_off_val[i].present);
+            set_state_relay(i, on_off_val[i].present);
             post_stt_btn_server(i, on_off_val[i].present); // post server
         }
     }
@@ -325,7 +324,7 @@ static void control_task(void *arg)
     while (1)
     {
         led_manager_loop();
-        relay_manager_loop();
+        relay_handler();
         control_on_off_scan();
         K9B_loop_check_pair_time_out();
         loop_check_save_flash();

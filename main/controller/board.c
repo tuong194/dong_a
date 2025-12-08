@@ -49,6 +49,22 @@ static esp_timer_handle_t g_button_timer_handle = NULL;
 static void button_cb(void *args);
 static void button_handler(button_dev_t *btn);
 
+void button_reset_touch_pin_config(gpio_num_t RST_TOUCH_PIN, uint8_t active_level){
+    esp_err_t ret = ESP_OK;
+    gpio_config_t gpio_config_pin = {
+        .pin_bit_mask = 1ULL << RST_TOUCH_PIN,
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    ret = gpio_config(&gpio_config_pin);    
+    if(ret != ESP_OK){
+        ESP_LOGE(TAG, "config RST_TOUCH_PIN FAIL");
+    }   
+    gpio_set_level(RST_TOUCH_PIN, active_level); 
+}
+
 esp_err_t button_gpio_init(const button_gpio_config_t *config){
     if(config == NULL){
         return ESP_FAIL;

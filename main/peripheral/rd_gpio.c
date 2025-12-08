@@ -1,36 +1,8 @@
-#include "rd_gpio.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "driver/gpio.h"
 
-gpio_num_t BUTTON_PIN_ARR[NUM_ELEMENT] = {
-    #ifdef BTN_1
-        BUTTON_PIN1
-    #endif
-    #ifdef BTN_2
-        ,BUTTON_PIN2
-    #endif
-    #ifdef BTN_3
-        ,BUTTON_PIN3
-    #endif
-    #ifdef BTN_4
-        ,BUTTON_PIN4
-    #endif
-};
-gpio_num_t RELAY_PIN_ARR[NUM_ELEMENT] = {
-    #ifdef BTN_1
-        RELAY1_PIN 
-    #endif
-    #ifdef BTN_2
-        ,RELAY2_PIN
-    #endif
-    #ifdef BTN_3
-        ,RELAY3_PIN
-    #endif
-    #ifdef BTN_4
-        ,RELAY4_PIN
-    #endif
-};
 
 static QueueHandle_t gpio_evt_queue = NULL;
 void IRAM_ATTR gpio_isr_handler(void *arg) // send data from ISR to QUEUE
@@ -67,23 +39,23 @@ void gpio_set_pin_output(gpio_num_t GPIO_NUM)
     gpio_config(&gpio_config_pin);
 }
 
-void rd_gpio_init(void)
-{
-    for (uint8_t i = 0; i < NUM_ELEMENT; i++)
-    {
-        // gpio_set_pin_input(BUTTON_PIN_ARR[i], GPIO_INTR_DISABLE);
-        gpio_set_pin_output(RELAY_PIN_ARR[i]);
-    }
-    gpio_set_pin_output(LED_DATA);
-    gpio_set_pin_output(LED_CLK);
-    gpio_set_pin_output(RESET_TOUCH_PIN);
+// void rd_gpio_init(void)
+// {
+//     for (uint8_t i = 0; i < NUM_ELEMENT; i++)
+//     {
+//         gpio_set_pin_input(BUTTON_PIN_ARR[i], GPIO_INTR_DISABLE);
+//         gpio_set_pin_output(RELAY_PIN_ARR[i]);
+//     }
+//     gpio_set_pin_output(LED_DATA);
+//     gpio_set_pin_output(LED_CLK);
+//     gpio_set_pin_output(RESET_TOUCH_PIN);
 
-    gpio_set_level(RESET_TOUCH_PIN, TOUCH_ACTIVE_POW);
-    gpio_set_level(LED_CLK, 1);
-}
+//     gpio_set_level(RESET_TOUCH_PIN, TOUCH_ACTIVE_POW);
+//     gpio_set_level(LED_CLK, 1);
+// }
 
-void test_gpio_init(){
-  gpio_set_pin_output(RESET_TOUCH_PIN);
-  gpio_set_level(RESET_TOUCH_PIN, TOUCH_ACTIVE_POW);
+// void test_gpio_init(){
+//   gpio_set_pin_output(RESET_TOUCH_PIN);
+//   gpio_set_level(RESET_TOUCH_PIN, TOUCH_ACTIVE_POW);
 
-}
+// }

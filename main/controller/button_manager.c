@@ -24,22 +24,21 @@ static uint8_t btn_index_pair = 0xff;
 
 static button_handle_t btn_handler[BTN_NUM];
 static button_info_t btn_info[BTN_NUM] = {
-#ifdef BTN_1
-    {BTN_1,0,0,"button_1"}
-#endif
+    #ifdef BTN_1
+        {BTN_1,0,0,"button_1"}
+    #endif
 
-#ifdef BTN_2
-    ,{BTN_2,0,0,"button_2"}
-#endif
+    #ifdef BTN_2
+        ,{BTN_2,0,0,"button_2"}
+    #endif
 
-#ifdef BTN_3
-    ,{BTN_3,0,0,"button_3"}
-#endif
+    #ifdef BTN_3
+        ,{BTN_3,0,0,"button_3"}
+    #endif
 
-#ifdef BTN_4
-    ,{BTN_4,0,0,"button_4"}
-#endif
-
+    #ifdef BTN_4
+        ,{BTN_4,0,0,"button_4"}
+    #endif
 };
 static void board_button_event_cb(void *arg, void *data);
 static inline uint8_t get_num_btn_keeping(){
@@ -68,58 +67,75 @@ static inline void clear_check_keep(uint8_t index)
     btn_info[index].is_keeping = 0;
 }
 
+
 esp_err_t button_gpio_config(void){
     esp_err_t ret = ESP_OK;
     const button_gpio_config_t button_gpio[BTN_NUM] = {
+    #ifdef BUTTON_PIN1
         {
             .gpio_num = BUTTON_PIN1,
             .active_level = TOUCH,
             .disable_pull = false,
-        },
-        {
+        }
+    #endif
+    #ifdef BUTTON_PIN2
+        ,{
             .gpio_num = BUTTON_PIN2,
             .active_level = TOUCH,
             .disable_pull = false,
-        },
-        {
+        }
+    #endif
+    #ifdef BUTTON_PIN3
+        ,{
             .gpio_num = BUTTON_PIN3,
             .active_level = TOUCH,
             .disable_pull = false,
-        },
-        {
+        }
+    #endif
+    #ifdef BUTTON_PIN4
+        ,{
             .gpio_num = BUTTON_PIN4,
             .active_level = TOUCH,
             .disable_pull = false,
         }
+    #endif
     };
 
     button_config_t btn_config[BTN_NUM] = {
+        #ifdef BTN_1
         {
             .press_time = CONFIG_PRESS_TIME_MS,
             .keep_time = CONFIG_KEEP_TIME_MS,
             .long_keep_time = CONFIG_LONG_KEEP_TIME_MS,
             .button_gpio_config = button_gpio[BTN_1]
-        },
-        {
+        }
+        #endif
+        #ifdef BTN_2
+        ,{
             .press_time = CONFIG_PRESS_TIME_MS,
             .keep_time = CONFIG_KEEP_TIME_MS,
             .long_keep_time = CONFIG_LONG_KEEP_TIME_MS,
             .button_gpio_config = button_gpio[BTN_2]
-        },
-        {
+        }
+        #endif
+        #ifdef BTN_3
+        ,{
             .press_time = CONFIG_PRESS_TIME_MS,
             .keep_time = CONFIG_KEEP_TIME_MS,
             .long_keep_time = CONFIG_LONG_KEEP_TIME_MS,
             .button_gpio_config = button_gpio[BTN_3]
-        },
-        {
+        }
+        #endif
+        #ifdef BTN_4
+        ,{
             .press_time = CONFIG_PRESS_TIME_MS,
             .keep_time = CONFIG_KEEP_TIME_MS,
             .long_keep_time = CONFIG_LONG_KEEP_TIME_MS,
             .button_gpio_config = button_gpio[BTN_4]
         }
+        #endif
     };
-
+    button_reset_touch_pin_config(RESET_TOUCH_PIN, TOUCH_ACTIVE_POW);
     for (size_t i = 0; i < BTN_NUM; i++)
     {
         btn_handler[i] = board_create_button_gpio(&btn_config[i]);
@@ -168,10 +184,6 @@ static void board_button_event_cb(void *arg, void *data){
             esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
         }
 #else
-        printf("[BOARD] btn %d is long keeping\n",btn->element + 1);
-        if(btn_info[BTN_1].is_long_keeping == 1) printf("[BOARD] btn 1 long keeping\n");
-        if(btn_info[BTN_2].is_long_keeping == 1) printf("[BOARD] btn 2 long keeping\n");
-
         if(btn_info[BTN_1].is_long_keeping == 1 && btn_info[BTN_2].is_long_keeping == 1){
             esp_event_post_to(btn_event_loop, BUTTON_EVENT_BASE, EVENT_BUTTON_CONFIG_WIFI, NULL, 0, portMAX_DELAY);
         }
